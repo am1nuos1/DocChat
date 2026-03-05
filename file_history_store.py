@@ -1,6 +1,6 @@
 import os
 import json
-from langchain_community.chat_message_histories import BaseChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import BaseMessage
 from langchain_core.messages import message_to_dict, messages_from_dict
 
@@ -18,7 +18,7 @@ class FileChatMessageHistory(BaseChatMessageHistory):
 
         os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
 
-    def add_messages(self, messages: Sequence[BaseMessage]) -> None:
+    def add_messages(self, messages) -> None:
         all_messages = list(self.messages)
         all_messages.extend(messages)
 

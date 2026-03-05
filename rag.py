@@ -8,6 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 from file_history_store import get_history
 
 
+
 def print_prompt(prompt):
     print("="*20)
     print(prompt.to_string())
@@ -42,26 +43,40 @@ class RagService:
         
 
         def format_for_retriever(value):
-            return value["input"]
+            return value[0].content
         
-        def format_for_template(value):
-            new_value ={}
-            new_value["input"] = value["input"]["input"]
-            new_value["context"] = value["context"]
-            new_value["history"] = value["input"]["history"]
-            return new_value
-
+        def temp1(value):
+            print("value in temp1:", value)
+            print(type(value))
+            return value
+        
+        def temp2(value):
+            print("value in temp2:", value)
+            print(type(value))
+            return value
+        
+        def format_for_template(x):
+            return {
+                "input": x["input"]["input"] if isinstance(x["input"], dict) else x["input"],
+                "context": x["context"],
+                "history": x["input"].get("history") if isinstance(x["input"], dict) else [],
+            }
 
         chain = (
             {
                 "input": RunnablePassthrough(),
-                "context": RunnableLambda(format_for_retriever)| retriever | format_documents
-            } | RunnableLambda(format_for_template) | self.prompt_template | print_prompt | self.chat_model | StrOutputParser()
+                "context": RunnableLambda(format_for_retriever) | retriever | RunnableLambda(format_documents),
+            }
+            | RunnableLambda(format_for_template) 
+            | self.prompt_template
+            | RunnableLambda(print_prompt)
+            | self.chat_model
+            | StrOutputParser()
         )
 
         conversation_chain = RunnableWithMessageHistory(
             chain,
-            message_history_cls=get_history,
+            get_session_history=get_history,
             input_message_key= "input",
             history_message_key= "history"
         )
@@ -73,6 +88,9 @@ if __name__ == "__main__":
         "configurable": {"session_id": "user_001"},
     }
     rag_service = RagService()
-    query = "春天适合穿什么？"
-    result = rag_service.chain.invoke({"input": query}, config=session_config)
-    print(result)
+    while(input != "exit"):
+        query = input("请输入问题（输入exit退出）：")
+        if query == "exit":
+            break
+        result = rag_service.chain.invoke({"input": query}, config=session_config)
+        print(result)
