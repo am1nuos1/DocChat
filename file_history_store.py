@@ -22,7 +22,7 @@ class FileChatMessageHistory(BaseChatMessageHistory):
         all_messages = list(self.messages)
         all_messages.extend(messages)
 
-        #写入本地文件
+        # Write to local file
         # new_messages = []
         # for message in all_messages:
         #     d = message_to_dict(message)

@@ -22,5 +22,5 @@ if __name__ == "__main__":
     embedding = DashScopeEmbeddings(model = "text-embedding-v4")
     vector_store_retriever = VectorStoreService(embedding).get_retriever()
     
-    res = vector_store_retriever.invoke("什么是RAG？")
+    res = vector_store_retriever.invoke("What is RAG?")
     print(res)

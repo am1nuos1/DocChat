@@ -1,4 +1,4 @@
-#知识库
+# Knowledge base
 import os
 import config_data as config
 import hashlib
@@ -20,7 +20,7 @@ def check_md5(md5_str):
                 return True
 
 def save_md5(md5_str:str):
-    "保存md5"
+    "Save md5"
     with open(config.md5_path, "a", encoding="utf-8") as f:
         f.write(md5_str + "\n")
 
@@ -53,7 +53,7 @@ class KnowledgeBaseSerive(object):
         md5_hex = get_string_md5(data)
 
         if check_md5(md5_hex):
-            return "文件已存在，无需上传"
+            return "File already exists; no upload needed"
 
         if len(data) > config.max_split_length:
             knowledge_chunks: list[str] = self.spliter.split_text(data)
@@ -70,7 +70,7 @@ class KnowledgeBaseSerive(object):
         )
 
         save_md5(md5_hex)
-        return f"{filename}文件上传成功"
+        return f"{filename} uploaded successfully"
 
     def get_knowledge(self, query):
         pass
@@ -80,7 +80,7 @@ class KnowledgeBaseSerive(object):
         if os.path.exists(config.md5_path):
             os.remove(config.md5_path)
         open(config.md5_path, "w", encoding="utf-8").close()
-        return "知识库已清空并重置"
+        return "Knowledge base has been cleared and reset"
 
 
 

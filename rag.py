@@ -21,11 +21,10 @@ class RagService:
     def __init__(self):
         self.vector_service = VectorStoreService(embedding = DashScopeEmbeddings(model = config.embedding_model))
         self.prompt_template = ChatPromptTemplate.from_messages([
-            ("system", "以我提供的资料为基础，简洁、专业、全面地回答用户的问题，"
-            "如果无法从提供的资料中得到答案，请说“根据我掌握的资料无法回答这个问题”。参考材料：{context}"),
-            ("system", "并且我提供用户的对话记录如下:"),
+            ("system", "Based on the provided materials, answer the user's question concisely, professionally, and comprehensively. If the answer cannot be found in the materials, reply: 'Based on the available materials, I cannot answer this question.' Reference materials: {context}"),
+            ("system", "Additionally, here is the user's conversation history:"),
             MessagesPlaceholder("history"),
-            ("human", "请回答用户提问：{input}")
+            ("human", "Please answer the user's question: {input}")
         ])
         self.chat_model = ChatTongyi(model = config.chat_model)
         self.chain = self.__get_chain()
@@ -35,10 +34,10 @@ class RagService:
 
         def format_documents(documents):
             if not documents:
-                return "无相关资料"
+                return "No relevant materials"
             formatted_docs = ""
             for doc in documents:
-                formatted_docs += f"资料片段：{doc.page_content}, 原数据：{doc.metadata}\n\n"
+                formatted_docs += f"Snippet: {doc.page_content}, Metadata: {doc.metadata}\n\n"
             return formatted_docs
         
 
@@ -89,7 +88,7 @@ if __name__ == "__main__":
     }
     rag_service = RagService()
     while(input != "exit"):
-        query = input("请输入问题（输入exit退出）：")
+        query = input("Please enter a question (type 'exit' to quit): ")
         if query == "exit":
             break
         result = rag_service.chain.invoke({"input": query}, config=session_config)
